@@ -8,7 +8,11 @@ var bodyArray = [];//this array will represent one email message body
 
 lineReader.on('line', function (line) {
     console.log('Line from file:', line);
-    console.log(line.charAt(0));
+    if (line.charAt(0) === "F" && line.charAt(1) === "r" && line.charAt(2) === "o" && line.charAt(3) === "m") {
+        console.log("*************************************************************************");
+        console.log("******************this line starts with 'From'***************************");
+        console.log("*************************************************************************");
+    }
 });
 
 

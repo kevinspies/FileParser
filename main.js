@@ -1,12 +1,15 @@
 var fs = require('fs');
 
-// var lineReader = require('readline').createInterface({
-//     input: require('fs').createReadStream('mbox.full')
-// });
+var lineReader = require('readline').createInterface({
+    input: require('fs').createReadStream('mbox.full')
+});
 
-// lineReader.on('line', function (line) {
-//     console.log('Line from file:', line);
-// });
+var bodyArray = [];//this array will represent one email message body
+
+lineReader.on('line', function (line) {
+    console.log('Line from file:', line);
+    console.log(line.charAt(0));
+});
 
 
 var logger = fs.createWriteStream('new.txt', {

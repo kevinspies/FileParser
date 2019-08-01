@@ -1,37 +1,16 @@
-// //npm install linereader to be able to access lineno variable? (linenumber)
-// var fs = require('fs');
-
-// var lineReader = require('readline').createInterface({
-//     input: require('fs').createReadStream('mbox.full')
-// });
-
-// var headerArray = [];
-// var bodyArray = [];//this array will represent one email message body
+var fs = require('fs');
 
 
-// lineReader.on('line', function (line) {
-//     console.log('Line from file:', line);
-//     if (line.charAt(0) === "F" && line.charAt(1) === "r" && line.charAt(2) === "o" && line.charAt(3) === "m" && line.charAt(4) === ":") {
-//         console.log("*************************************************************************");
-//         console.log("******************this line starts with 'From:'***************************");
-//         console.log("*************************************************************************");
-//         //now let's add this line as a supposed start to a header! so we'll add it to the temp header array
-//         headerArray.push(line);
-//     }
-// });
+var headerArray = [];
+var bodyArray = [];//this array will represent one email message body
+//perhaps I want to have some booleans to keep track of if the previous line was 'From', or the previous line was 'From:' or 'Date:'
+//so in each on line if statement i can have more accurate checks and catch more errors
 
-// lineReader.on('line', function (lineno, line) {
-//     console.log("line number: " + lineno);
-// })
+
 
 var LineReader = require('linereader');
 var lr = new LineReader('./mbox.full');
 
-
-// var lr = new LineReader('./linereader.js', {skipEmptyLines: true});
-// var lr = new LineReader('https://github.com/');
-// var lr = new LineReader('https://raw.githubusercontent.com/nswbmw/N-blog/master/public/images/lufei.jpg', {encoding: "base64"});
-// var lr = new LineReader('HTTP://www.hot3c.com', {encoding: 'Big5'});
 
 lr.on('error', function (err) {
     console.log(err);
@@ -39,34 +18,47 @@ lr.on('error', function (err) {
 });
 
 lr.on('line', function (lineno, line) {
-    // if (lineno <= 100) {
-    //     console.log("lineno: " + lineno);
-    //     console.log(lineno + "   " + line);
-    // } else {
-    //     lr.close();
-    // }
-    // lr.pause();
-    // setTimeout(function () {
-    //     lr.resume();
-    // }, 1);
+
     console.log("this is a line: " + line);
+
+    //should be a switch and should probably use substring
     if (line.charAt(0) === "F" && line.charAt(1) === "r" && line.charAt(2) === "o" && line.charAt(3) === "m") {
+        var fromBool = true;//see line 10 and 11 essentially this means if we hit 'From:' 
         //         console.log("*************************************************************************");
         //         console.log("******************this line starts with 'From:'***************************");
         //         console.log("*************************************************************************");
         //         //now let's add this line as a supposed start to a header! so we'll add it to the temp header array
-        // headerArray[lineno] = line;
         headerArray.push(line);
         headerArray.push(lineno);//just gonna push both line and line no for now so i can kinda keep track of the line i was at in the original file
         //     in case i realize this isn't a true header, shaky
     }
-    // (headerArray[lineno - 1])
-    else if (line.charAt(0) === "F" && line.charAt(1) === "r" && line.charAt(2) === "o" && line.charAt(3) === "m" && line.charAt(4) === ":")
+
+    if (line.charAt(0) === "F" && line.charAt(1) === "r" && line.charAt(2) === "o" && line.charAt(3) === "m" && line.charAt(4) === ":") {
+        if (headerArray[1] === lineno - 1) {
+            //this means the previously pushed line into the header array started with 'From', aka correct formatting for a header, except it assumes the
+            //from text only takes up one line.. unfortunately given the amount of time i have left i'll have to not account for that.
+        }
+    }
+    if (line.charAt(0) === "D" && line.charAt(1) === "a" && line.charAt(2) === "t" && line.charAt(3) === "e" && line.charAt(4) === ":") {
+
+    }
+    if (line.charAt(0) === "S" && line.charAt(1) === "u" && line.charAt(2) === "b" && line.charAt(3) === "j" && line.charAt(4) === "e" && line.charAt(5) === "c" && line.charAt(6) === "t" && line.charAt(7) === ":") {
+
+    }
+    //the essence of what I would want to accomplish with the above if statements is pushing and popping inside a short array, and with that deciding if I'm looking at a email header
+    //then once I encounter the next line with substance i'll start pushing onto the bodyArray until i find another header. there's a lot of code to write here, but I think 
+    //if i had more time (and I'll surely work more on this in my free time!) I think it could be done with "hard code" like I have here. but likely better planning would
+    //save me time and make the code much cleaner. Not sure if submitting a javascript file as incomplete as this is a good idea, but I figured since I did spend some time
+    //working on it and thinking about it I'd just submit what I have!
 });
 
 lr.on('end', function () {
     console.log("End of file");
+    lr.close();
 });
+
+
+//the (below) write code I would incorporate inside of the read code.. todo!
 
 // var logger = fs.createWriteStream('new.txt', {
 //     flags: 'a' // 'a' means appending (old data will be preserved)
@@ -76,39 +68,12 @@ lr.on('end', function () {
 // logger.write('more data\n') // again
 // logger.write('and more\n') // again
 
-// fs.readFile('mbox.full', function (err, data) {
-//     if (err) {
-//         console.log("extreme error!");
-//         throw err;
-//     }
-
-//     // Convert file to a string object
-
-//     var unParsed = data.toString();
-
-//     // Split the text into an array of strings where each
-//     // element is a message
-
-//     // var indivMessages = unParsed.split("From -");
-//     // console.log(indivMessages.length);
-
-//     console.log(unParsed);
-
-
-
-
-//     // console.log(data); returns -->  <Buffer 46 72 6f 6d 20 6e 6f 62 6f 64 79 20 4d 6f 6e 20 53 65 70 20 31 37 20 30 30 3a 30 30 3a 30 30 20 32 30 30 31 0a 46 72 6f 6d 3a 20 41 20 28 7a 7a 7a 29 ... >
-
-// });
-
 // fs.writeFile('new.txt', "hi", (err) => {
 //     // In case of a error throw err. 
 //     if (err) {
 //         console.log("extreme error!");
 //         throw err;
 //     }
-
-// });
 
 // fs.appendFile('new.txt', 'new data', function (err) {
 //     if (err) {
@@ -118,3 +83,5 @@ lr.on('end', function () {
 //         console.log("hello world!");
 //     }
 // });
+
+//ctl c to cancel nonstop running of program (whoops...)
